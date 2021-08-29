@@ -2,7 +2,8 @@ import numpy as np
 import pandas as pd
 import data_preprocessing as dp
 import ann
-import tensorflow as tf
+from sklearn.metrics import r2_score
+from keras.utils.vis_utils import plot_model
 
 if __name__ == '__main__':
 
@@ -15,10 +16,15 @@ if __name__ == '__main__':
 
     # model creation
     model = ann.create_ann()
-    model.compile(optimizer='adam', loss=tf.keras.losses.MeanAbsoluteError(), metrics="accuracy")
-
+    model.compile(optimizer='adam', loss='mean_squared_error')
+    plot_model(model, to_file='model_plot.png', show_shapes=True, show_layer_names=True)
     # model training
+    model.fit(x_train_scaled, y_train, batch_size=42, epochs=100)
 
+    # model prediction
+    np.set_printoptions(precision=2)
+    print(np.concatenate((model.predict(x_test_scaled).reshape(-1, 1), y_test.reshape(-1, 1)), 1))
+    print(r2_score(y_test, model.predict(x_test_scaled)))
 
 
     
